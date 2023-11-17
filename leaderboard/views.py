@@ -11,7 +11,7 @@ def get_leaderboard_entry(request, entry_id):
             'id': entry.user.id,
             'username': entry.user.username,
             'email': entry.user.email,
-            # Add other user attributes as needed
+
         },
         'points': entry.points,
     }
@@ -26,7 +26,7 @@ def get_all_leaderboard_entries(request):
                 'id': entry.user.id,
                 'username': entry.user.username,
                 'email': entry.user.email,
-                # Add other user attributes as needed
+
             },
             'points': entry.points,
         }
