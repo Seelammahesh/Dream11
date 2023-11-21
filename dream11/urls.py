@@ -22,7 +22,8 @@ from countries.views import get_country,get_all_countries,add_country,delete_cou
 
 from leaderboard.views import get_leaderboard_entry,get_all_leaderboard_entries,create_leaderboard_entry,delete_leaderboard_entry,get_all_leaderboard_entries,update_leaderboard_entry
 
-from matches.views import get_match,get_all_matches,match_detail,create_match,update_match,delete_match,create_match_result,update_match_result,delete_match_result
+from matches.views import get_all_match_results, get_match_result, get_all_matches,create_match,update_match,delete_match,create_match_result,update_match_result,delete_match_result
+
 
 from players.views import get_player,get_all_players,update_player,delete_player,create_player
 
@@ -44,7 +45,7 @@ urlpatterns = [
     path('countries/<int:country_id>/', get_country, name='get_country'),
     path('countries/', get_all_countries, name='get_all_countries'),
     path('add_country/', add_country, name="add_country"),
-    path('update/<int:id>/', update_country, name="update_country"),
+    path('update/', update_country, name="update_country"),
     path('delete/<int:id>/', delete_country, name="delete_country"),
 
     #leaderboard
@@ -55,9 +56,10 @@ urlpatterns = [
     path('delete_leaderboard_entry/', delete_leaderboard_entry, name='delete_leaderboard_entry'),
     
     #matches
-    path('matches/<int:match_id>/', get_match, name='get_match'),
+    path('get-match-result/<int:match_result_id>/',get_match_result, name='get_match_result'),
+    path('get_all_match_results/', get_all_match_results ,name='get_all_match_result'),
+
     path('matches/', get_all_matches, name='get_all_matches'),
-    path('match-detail/',match_detail,name="match_detail"),
     path('create_match/', create_match, name='create_match'),
     path('update_match/', update_match, name='update_match'),
     path('delete_match/', delete_match, name='delete_match'),

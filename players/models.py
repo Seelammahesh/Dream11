@@ -15,7 +15,7 @@ class Player(models.Model):
 
     bowling_style = models.CharField(max_length=255,null=True,blank=True,choices=[('Right-arm fast', 'Right-arm fast')
         , ('Left-arm fast', 'Left-arm fast'),('Left-arm medium','Left-arm medium'),('Right-arm medium','Right-arm medium'),
-                                                              ('Left-arm spin','Left-arm spin'),('Right-arm spin','Right-arm spin')])
+                                                              ('Left-arm spin','Left-arm spin'),('Right-arm spin','Right-arm spin'),('not-a-Bowler','not-a-Bowler')])
     player_type=models.CharField(max_length=255,null=True,blank=True,choices=[('Batsmen','Batsmen'),('Bowler','Bowler'),('All-rounder','All-rounder'),('Batsmen-Wicketkeeper','Batsmen-Wicketkeeper')])
 
     is_captain=models.BooleanField(null=True,blank=True)

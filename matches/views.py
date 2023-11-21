@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import IntegrityError
+from django.db.models import ObjectDoesNotExist
 from .models import Match, MatchResult
 from teams.models import Team
 from countries.models import Country
@@ -21,8 +22,8 @@ def create_match(request):
         return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        team1 = Country.objects.get(id=team1_id)
-        team2 = Country.objects.get(id=team2_id)
+        team1 = Team.objects.get(id=team1_id)
+        team2 = Team.objects.get(id=team2_id)
 
         match = Match.objects.create(
             date=date,
@@ -144,6 +145,35 @@ def delete_match(request):
             'message': 'Invalid match_id',
         }
         return Response(context, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_all_matches(request):
+    matches = Match.objects.all()
+    match_list = [
+        {
+            'id': match.id,
+            'date': match.date,
+            'team1': {
+                'id': match.team1.id,
+                'name': match.team1.name,
+                'country': match.team1.country.name if match.team1.country else None,
+                'captain_name': match.team1.captain_name,
+                'logo': match.team1.logo.url if match.team1.logo else None,
+
+            },
+            'team2': {
+                'id': match.team2.id,
+                'name': match.team2.name,
+                'country': match.team2.country.name if match.team2.country else None,
+                'captain_name': match.team2.captain_name,
+                'logo': match.team2.logo.url if match.team2.logo else None,
+            },
+            'venue': match.venue,
+
+        }
+        for match in matches
+    ]
+    return Response(match_list)
 
 @api_view(['POST'])
 def create_match_result(request):
@@ -289,81 +319,83 @@ def delete_match_result(request):
         }
         return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['GET'])
-def get_match(request, match_id):
-    match = get_object_or_404(Match, id=match_id)
-    match_data = {
-        'id': match.id,
-        'date': match.date,
-        'team1': {
-            'id': match.team1.id,
-            'name': match.team1.name,
-            'country': match.team1.country.name if match.team1.country else None,
-            'captain_name': match.team1.captain_name,
-            'logo': match.team1.logo.url if match.team1.logo else None,
+def get_all_match_results(request):
+    match_results = MatchResult.objects.all()
+    match_result_list = []
 
-        },
-        'team2': {
-            'id': match.team2.id,
-            'name': match.team2.name,
-            'country': match.team2.country.name if match.team2.country else None,
-            'captain_name': match.team2.captain_name,
-            'logo': match.team2.logo.url if match.team2.logo else None,
+    for result in match_results:
+        team1_data = {}
+        if result.match.team1:
+            team1_data = {
+                'id': result.match.team1.id,
+                'name': result.match.team1.name,
+                'country': result.match.team1.country.name if result.match.team1.country else None,
+                'captain_name': result.match.team1.captain_name,
+                'logo': result.match.team1.logo.url if result.match.team1.logo else None,
+            }
 
-        },
-        'venue': match.venue,
-    }
-    return Response(match_data)
-@api_view(['GET'])
-def get_all_matches(request):
-    matches = Match.objects.all()
-    match_list = [
-        {
-            'id': match.id,
-            'date': match.date,
-            'team1': {
-                'id': match.team1.id,
-                'name': match.team1.name,
-                'country': match.team1.country.name if match.team1.country else None,
-                'captain_name': match.team1.captain_name,
-                'logo': match.team1.logo.url if match.team1.logo else None,
+        team2_data = {}
+        if result.match.team2:
+            team2_data = {
+                'id': result.match.team2.id,
+                'name': result.match.team2.name,
+                'country': result.match.team2.country.name if result.match.team2.country else None,
+                'captain_name': result.match.team2.captain_name,
+                'logo': result.match.team2.logo.url if result.match.team2.logo else None,
+            }
 
-            },
-            'team2': {
-                'id': match.team2.id,
-                'name': match.team2.name,
-                'country': match.team2.country.name if match.team2.country else None,
-                'captain_name': match.team2.captain_name,
-                'logo': match.team2.logo.url if match.team2.logo else None,
-            },
-            'venue': match.venue,
-
+        match_result_data = {
+            'id': result.id,
+            'match_id': result.match_id,
+            'team1': team1_data,
+            'team2': team2_data,
+            'result': result.result,
         }
-        for match in matches
-    ]
-    return Response(match_list, )
+
+        match_result_list.append(match_result_data)
+
+    return Response(match_result_list)
 
 
-def match_detail(request, match_id):
-    match = get_object_or_404(Match, id=match_id)
+@api_view(['GET'])
+def get_match_result(request, match_result_id):
+    try:
+        match_result = MatchResult.objects.get(id=match_result_id)
 
+        team1_data = {}
+        if match_result.match.team1:
+            team1_data = {
+                'id': match_result.match.team1.id,
+                'name': match_result.match.team1.name,
+                'country': match_result.match.team1.country.name if match_result.match.team1.country else None,
+                'captain_name': match_result.match.team1.captain_name,
+                'logo': match_result.match.team1.logo.url if match_result.match.team1.logo else None,
+            }
 
-    result_team1 = match.matchresult_set.filter(team=match.team1).first()
-    result_team2 = match.matchresult_set.filter(team=match.team2).first()
+        team2_data = {}
+        if match_result.match.team2:
+            team2_data = {
+                'id': match_result.match.team2.id,
+                'name': match_result.match.team2.name,
+                'country': match_result.match.team2.country.name if match_result.match.team2.country else None,
+                'captain_name': match_result.match.team2.captain_name,
+                'logo': match_result.match.team2.logo.url if match_result.match.team2.logo else None,
+            }
 
+        result_data = {
+            'id': match_result.id,
+            'match_id': match_result.match_id,
+            'team1': team1_data,
+            'team2': team2_data,
+            'result': match_result.result,
+        }
 
-    if result_team1.result > result_team2.result:
-        winner = match.team1
-    elif result_team1.result < result_team2.result:
-        winner = match.team2
-    else:
-        winner = None
-    context = {
-        'match': match,
-        'result_team1': result_team1,
-        'result_team2': result_team2,
-        'winner': winner,
-    }
+        return Response(result_data)
 
-    return Response(context)
+    except MatchResult.DoesNotExist:
+        return Response({'message': 'MatchResult not found'}, status=404)
+
+    except ObjectDoesNotExist:
+        return Response({'message': 'Object does not exist'}, status=404)
+

@@ -31,7 +31,7 @@ def get_all_countries(request):
         }
         for country in countries
     ]
-    return JsonResponse(country_list, safe=False)
+    return Response(country_list)
 
 #<------POST-Request------->
 

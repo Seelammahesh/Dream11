@@ -104,6 +104,7 @@ def update_user(request):
         }
         return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['DELETE'])
 def delete_user(request):
     user_id = request.POST.get('user_id', None)

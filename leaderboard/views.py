@@ -145,7 +145,8 @@ def get_leaderboard_entry(request, entry_id):
         },
         'points': entry.points,
     }
-    return JsonResponse(entry_data)
+    return Response(entry_data)
+
 @api_view(['GET'])
 def get_all_leaderboard_entries(request):
     entries = LeaderboardEntry.objects.all()
@@ -162,5 +163,5 @@ def get_all_leaderboard_entries(request):
         }
         for entry in entries
     ]
-    return JsonResponse(entry_list, safe=False)
+    return Response(entry_list)
 

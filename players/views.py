@@ -13,11 +13,15 @@ def get_player(request, player_id):
     player_data = {
         'id': player.id,
         'name': player.name,
+        'country':player.country.name,
         'team': player.team.name if player.team else None,
-        'position': player.position,
+        'batting_style':player.batting_style,
+        'bowling_style':player.bowling_style,
         'jersey_number': player.jersey_number,
+        'is_captain':player.is_captain,
+        'player_type':player.player_type,
     }
-    return JsonResponse(player_data)
+    return Response(player_data)
 @api_view(['GET'])
 def get_all_players(request):
     players = Player.objects.all()
@@ -25,13 +29,18 @@ def get_all_players(request):
         {
             'id': player.id,
             'name': player.name,
+            'country': player.country.name,
             'team': player.team.name if player.team else None,
-            'position': player.position,
+            'batting_style': player.batting_style,
+            'bowling_style': player.bowling_style,
             'jersey_number': player.jersey_number,
+            'is_captain': player.is_captain,
+            'player_type': player.player_type,
+
         }
         for player in players
     ]
-    return JsonResponse(player_list, safe=False)
+    return Response(player_list)
 @api_view(['POST'])
 def create_player(request):
     name = request.data.get('name', None)

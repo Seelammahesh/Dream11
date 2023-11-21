@@ -163,4 +163,4 @@ def get_all_teams(request):
         }
         for team in teams
     ]
-    return Response(team_list, safe=False)
+    return Response(team_list)
